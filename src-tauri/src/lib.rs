@@ -1,7 +1,6 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
-// 使用特性来控制相机插件的导入
-#[cfg(feature = "camera")]
+#[cfg(target_os = "android")]
 use tauri_plugin_camera;
 
 #[tauri::command]
@@ -15,9 +14,7 @@ pub fn run() {
     builder = builder.plugin(tauri_plugin_opener::init());
     builder = builder.plugin(tauri_plugin_os::init());
 
-    // 只在启用 camera 特性时初始化相机插件
-
-    #[cfg(feature = "camera")]
+    #[cfg(target_os = "android")]
     {
         builder = builder.plugin(tauri_plugin_camera::init());
     }

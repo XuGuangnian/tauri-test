@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/android-schema.json",
+  "identifier": "android",
+  "description": "Capability for Android platform",
+  "windows": ["main"],
+  "permissions": ["camera:allow-take-picture", "camera:allow-record-video"],
+  "platforms": ["android"]
+}

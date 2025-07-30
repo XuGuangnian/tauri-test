@@ -1,25 +1,8 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for Android platform with camera support",
+  "description": "Default capability for desktop platforms",
   "windows": ["main"],
-  "permissions": [
-    "core:default",
-    "opener:default",
-    "os:default"
-  ],
-  "optionalPermissions": [
-    {
-      "name": "camera:allow-take-picture",
-      "condition": {
-        "feature": "camera"
-      }
-    },
-    {
-      "name": "camera:allow-record-video",
-      "condition": {
-        "feature": "camera"
-      }
-    }
-  ]
+  "permissions": ["core:default", "opener:default", "os:default"],
+  "platforms": ["macOS", "windows", "linux"]
 }
