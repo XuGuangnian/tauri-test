@@ -1,6 +1,6 @@
 use tauri::{
-  plugin::{Builder, TauriPlugin},
-  Manager, Runtime,
+    plugin::{Builder, TauriPlugin},
+    Manager, Runtime,
 };
 
 pub use models::*;
@@ -23,26 +23,26 @@ use mobile::PhoneDialer;
 
 /// Extensions to [`tauri::App`], [`tauri::AppHandle`] and [`tauri::Window`] to access the phone-dialer APIs.
 pub trait PhoneDialerExt<R: Runtime> {
-  fn phone_dialer(&self) -> &PhoneDialer<R>;
+    fn phone_dialer(&self) -> &PhoneDialer<R>;
 }
 
 impl<R: Runtime, T: Manager<R>> crate::PhoneDialerExt<R> for T {
-  fn phone_dialer(&self) -> &PhoneDialer<R> {
-    self.state::<PhoneDialer<R>>().inner()
-  }
+    fn phone_dialer(&self) -> &PhoneDialer<R> {
+        self.state::<PhoneDialer<R>>().inner()
+    }
 }
 
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
-  Builder::new("phone-dialer")
-    .invoke_handler(tauri::generate_handler![commands::ping])
-    .setup(|app, api| {
-      #[cfg(mobile)]
-      let phone_dialer = mobile::init(app, api)?;
-      #[cfg(desktop)]
-      let phone_dialer = desktop::init(app, api)?;
-      app.manage(phone_dialer);
-      Ok(())
-    })
-    .build()
+    Builder::new("phone-dialer")
+        .invoke_handler(tauri::generate_handler![commands::ping])
+        .setup(|app, api| {
+            #[cfg(mobile)]
+            let phone_dialer = mobile::init(app, api)?;
+            #[cfg(desktop)]
+            let phone_dialer = desktop::init(app, api)?;
+            app.manage(phone_dialer);
+            Ok(())
+        })
+        .build()
 }
