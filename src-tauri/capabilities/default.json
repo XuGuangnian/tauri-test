@@ -3,6 +3,5 @@
   "identifier": "default",
   "description": "Default capability for desktop platforms",
   "windows": ["main"],
-  "permissions": ["core:default", "opener:default", "os:default"],
-  "platforms": ["macOS", "windows", "linux"]
+  "permissions": ["core:default", "opener:default", "os:default"]
 }

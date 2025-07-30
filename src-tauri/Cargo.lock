@@ -3748,6 +3748,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-phone-dialer"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.12",
+]
+
+[[package]]
 name = "tauri-runtime"
 version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3807,6 +3817,7 @@ dependencies = [
  "tauri-plugin-camera",
  "tauri-plugin-opener",
  "tauri-plugin-os",
+ "tauri-plugin-phone-dialer",
 ]
 
 [[package]]

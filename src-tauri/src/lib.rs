@@ -13,6 +13,7 @@ pub fn run() {
     let mut builder = tauri::Builder::default();
     builder = builder.plugin(tauri_plugin_opener::init());
     builder = builder.plugin(tauri_plugin_os::init());
+    builder = builder.plugin(tauri_plugin_phone_dialer::init());
 
     #[cfg(target_os = "android")]
     {

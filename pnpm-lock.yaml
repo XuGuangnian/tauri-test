@@ -20,6 +20,9 @@ importers:
       tauri-plugin-camera:
         specifier: ^0.1.4
         version: 0.1.4
+      tauri-plugin-phone-dialer-api:
+        specifier: file:./tauri-plugin-phone-dialer
+        version: file:tauri-plugin-phone-dialer
       vue:
         specifier: ^3.5.13
         version: 3.5.18(typescript@5.6.3)
@@ -558,6 +561,9 @@ packages:
   tauri-plugin-camera@0.1.4:
     resolution: {integrity: sha512-0ttYUiKr21H6MC//jTe9rRsv+QLOhFS8zU0ADWt2iXgouc8kx5y5t3/x7UGtsgxJqNVR+kcpUoS9YuflvH6Q/A==}
 
+  tauri-plugin-phone-dialer-api@file:tauri-plugin-phone-dialer:
+    resolution: {directory: tauri-plugin-phone-dialer, type: directory}
+
   tinyglobby@0.2.14:
     resolution: {integrity: sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ==}
     engines: {node: '>=12.0.0'}
@@ -1037,6 +1043,10 @@ snapshots:
     dependencies:
       '@tauri-apps/api': 2.7.0
       '@tauri-apps/cli': 2.7.1
+
+  tauri-plugin-phone-dialer-api@file:tauri-plugin-phone-dialer:
+    dependencies:
+      '@tauri-apps/api': 2.7.0
 
   tinyglobby@0.2.14:
     dependencies:

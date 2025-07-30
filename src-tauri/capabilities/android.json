@@ -3,6 +3,10 @@
   "identifier": "android",
   "description": "Capability for Android platform",
   "windows": ["main"],
-  "permissions": ["camera:allow-take-picture", "camera:allow-record-video"],
-  "platforms": ["android"]
+  "platforms": ["android"],
+  "permissions": [
+    "camera:allow-take-picture",
+    "camera:allow-record-video",
+    "phone-dialer:default"
+  ]
 }

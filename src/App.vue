@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { platform } from "@tauri-apps/plugin-os";
+import { ping } from "tauri-plugin-phone-dialer-api";
 
 // 条件导入相机插件，只在需要时导入
 let takePicture: any = null;
@@ -22,6 +23,12 @@ const videoResult = ref<{
 const cameraStatus = ref("");
 const isAndroid = ref(false);
 const platformName = ref("");
+
+// Phone Dialer 插件测试相关
+const pingInput = ref("Hello from TypeScript!");
+const pingResult = ref("");
+const rustPingInput = ref("Hello from Rust Command!");
+const rustPingResult = ref("");
 
 onMounted(async () => {
   try {
@@ -99,6 +106,36 @@ function clearResults() {
   pictureResult.value = null;
   videoResult.value = null;
   cameraStatus.value = "";
+}
+
+// Phone Dialer 插件测试函数
+async function testTypeScriptPing() {
+  try {
+    pingResult.value = "正在调用 TypeScript ping...";
+    const result = await ping(pingInput.value);
+    pingResult.value = `TypeScript ping 成功: ${result}`;
+  } catch (error) {
+    pingResult.value = `TypeScript ping 失败: ${error}`;
+    console.error("TypeScript ping 错误:", error);
+  }
+}
+
+async function testRustPing() {
+  try {
+    rustPingResult.value = "正在调用 Rust command ping...";
+    const result = await invoke("plugin:phone-dialer|ping", {
+      payload: { value: rustPingInput.value },
+    });
+    rustPingResult.value = `Rust ping 成功: ${JSON.stringify(result)}`;
+  } catch (error) {
+    rustPingResult.value = `Rust ping 失败: ${error}`;
+    console.error("Rust ping 错误:", error);
+  }
+}
+
+function clearPingResults() {
+  pingResult.value = "";
+  rustPingResult.value = "";
 }
 </script>
 
@@ -203,6 +240,75 @@ function clearResults() {
           <li>确保应用已获得相机权限</li>
           <li>点击"拍照"会打开相机进行拍照</li>
           <li>点击"录制视频"会打开相机进行视频录制</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phone Dialer 插件测试 -->
+    <div class="phone-dialer-section">
+      <h2>📞 Phone Dialer 插件测试</h2>
+
+      <div class="plugin-info">
+        <p>
+          <strong>插件状态:</strong> Phone Dialer 插件已加载，可以测试 ping 功能
+        </p>
+        <p class="plugin-success">✅ 此插件在所有平台上都可以使用</p>
+      </div>
+
+      <!-- TypeScript Ping 测试 -->
+      <div class="ping-test-section">
+        <h3>🔷 TypeScript Ping 测试</h3>
+        <div class="ping-controls">
+          <input
+            v-model="pingInput"
+            placeholder="输入要发送的消息..."
+            class="ping-input"
+          />
+          <button @click="testTypeScriptPing" class="ping-btn ts-btn">
+            📡 TS Ping
+          </button>
+        </div>
+        <div v-if="pingResult" class="ping-result">
+          {{ pingResult }}
+        </div>
+      </div>
+
+      <!-- Rust Command Ping 测试 -->
+      <div class="ping-test-section">
+        <h3>🦀 Rust Command Ping 测试</h3>
+        <div class="ping-controls">
+          <input
+            v-model="rustPingInput"
+            placeholder="输入要发送的消息..."
+            class="ping-input"
+          />
+          <button @click="testRustPing" class="ping-btn rust-btn">
+            ⚡ Rust Ping
+          </button>
+        </div>
+        <div v-if="rustPingResult" class="ping-result">
+          {{ rustPingResult }}
+        </div>
+      </div>
+
+      <div class="ping-controls">
+        <button @click="clearPingResults" class="clear-btn">🗑️ 清除结果</button>
+      </div>
+
+      <!-- 使用说明 -->
+      <div class="instructions">
+        <h3>📋 使用说明:</h3>
+        <ul>
+          <li>
+            <strong>TypeScript Ping:</strong> 使用插件的 TypeScript API 直接调用
+          </li>
+          <li>
+            <strong>Rust Command Ping:</strong> 使用 Tauri 的 invoke 方法调用
+            Rust 命令
+          </li>
+          <li>两种方式都会调用相同的 Rust 后端逻辑</li>
+          <li>可以输入任意文本进行测试</li>
+          <li>观察返回结果的格式差异</li>
         </ul>
       </div>
     </div>
@@ -513,6 +619,138 @@ button {
 
   .instructions ul {
     color: #e2e8f0;
+  }
+}
+
+/* Phone Dialer 插件测试样式 */
+.phone-dialer-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fafafa;
+}
+
+.plugin-info {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #007bff;
+}
+
+.plugin-success {
+  color: #155724;
+  background-color: #d4edda;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border-left: 4px solid #28a745;
+  margin: 0.5rem 0;
+}
+
+.ping-test-section {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ping-test-section h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.ping-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.ping-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6em 1.2em;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1em;
+  background-color: #ffffff;
+}
+
+.ping-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.ping-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.ts-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+}
+
+.rust-btn {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.ping-result {
+  text-align: center;
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: #e8f4fd;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #2c3e50;
+  border-left: 4px solid #3b82f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .phone-dialer-section {
+    background-color: #1a1a1a;
+    border-color: #444;
+  }
+
+  .plugin-info {
+    background-color: #2d3748;
+    border-left-color: #4299e1;
+  }
+
+  .plugin-success {
+    background-color: #2d3748;
+    color: #68d391;
+    border-left-color: #68d391;
+  }
+
+  .ping-test-section {
+    background-color: #2d3748;
+    color: #e2e8f0;
+  }
+
+  .ping-test-section h3 {
+    color: #e2e8f0;
+  }
+
+  .ping-input {
+    background-color: #4a5568;
+    border-color: #6b7280;
+    color: #e2e8f0;
+  }
+
+  .ping-result {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border-left-color: #4299e1;
   }
 }
 </style>
