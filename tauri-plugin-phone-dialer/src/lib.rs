@@ -35,7 +35,12 @@ impl<R: Runtime, T: Manager<R>> crate::PhoneDialerExt<R> for T {
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("phone-dialer")
-        .invoke_handler(tauri::generate_handler![commands::ping])
+        .invoke_handler(tauri::generate_handler![
+            commands::ping,
+            commands::dial_phone_number,
+            commands::request_phone_permission,
+            commands::check_phone_permission
+        ])
         .setup(|app, api| {
             #[cfg(mobile)]
             let phone_dialer = mobile::init(app, api)?;

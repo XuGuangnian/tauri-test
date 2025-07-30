@@ -7,6 +7,7 @@
   "permissions": [
     "camera:allow-take-picture",
     "camera:allow-record-video",
-    "phone-dialer:default"
+    "phone-dialer:default",
+    "phone-dialer:allow-dial-phone-number"
   ]
 }

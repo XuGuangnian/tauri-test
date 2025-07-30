@@ -30,4 +30,22 @@ impl<R: Runtime> PhoneDialer<R> {
             .run_mobile_plugin("ping", payload)
             .map_err(Into::into)
     }
+
+    pub fn dial_phone_number(&self, payload: DialPhoneRequest) -> crate::Result<DialPhoneResponse> {
+        self.0
+            .run_mobile_plugin("dialPhoneNumber", payload)
+            .map_err(Into::into)
+    }
+
+    pub fn request_phone_permission(&self) -> crate::Result<PermissionResponse> {
+        self.0
+            .run_mobile_plugin("requestPhonePermission", ())
+            .map_err(Into::into)
+    }
+
+    pub fn check_phone_permission(&self) -> crate::Result<PermissionResponse> {
+        self.0
+            .run_mobile_plugin("checkPhonePermission", ())
+            .map_err(Into::into)
+    }
 }

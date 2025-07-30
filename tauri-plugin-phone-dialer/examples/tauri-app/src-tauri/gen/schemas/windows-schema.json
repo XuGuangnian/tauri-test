@@ -2097,10 +2097,22 @@
           "markdownDescription": "Denies the unminimize command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-ping`",
+          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-ping`\n- `allow-dial-phone-number`",
           "type": "string",
           "const": "phone-dialer:default",
-          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-ping`"
+          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-ping`\n- `allow-dial-phone-number`"
+        },
+        {
+          "description": "Enables the check_phone_permission command without any pre-configured scope.",
+          "type": "string",
+          "const": "phone-dialer:allow-check-phone-permission",
+          "markdownDescription": "Enables the check_phone_permission command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the dial_phone_number command without any pre-configured scope.",
+          "type": "string",
+          "const": "phone-dialer:allow-dial-phone-number",
+          "markdownDescription": "Enables the dial_phone_number command without any pre-configured scope."
         },
         {
           "description": "Enables the ping command without any pre-configured scope.",
@@ -2109,10 +2121,34 @@
           "markdownDescription": "Enables the ping command without any pre-configured scope."
         },
         {
+          "description": "Enables the request_phone_permission command without any pre-configured scope.",
+          "type": "string",
+          "const": "phone-dialer:allow-request-phone-permission",
+          "markdownDescription": "Enables the request_phone_permission command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the check_phone_permission command without any pre-configured scope.",
+          "type": "string",
+          "const": "phone-dialer:deny-check-phone-permission",
+          "markdownDescription": "Denies the check_phone_permission command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the dial_phone_number command without any pre-configured scope.",
+          "type": "string",
+          "const": "phone-dialer:deny-dial-phone-number",
+          "markdownDescription": "Denies the dial_phone_number command without any pre-configured scope."
+        },
+        {
           "description": "Denies the ping command without any pre-configured scope.",
           "type": "string",
           "const": "phone-dialer:deny-ping",
           "markdownDescription": "Denies the ping command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the request_phone_permission command without any pre-configured scope.",
+          "type": "string",
+          "const": "phone-dialer:deny-request-phone-permission",
+          "markdownDescription": "Denies the request_phone_permission command without any pre-configured scope."
         }
       ]
     },

@@ -2,7 +2,14 @@
 import { ref, onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { platform } from "@tauri-apps/plugin-os";
-import { ping } from "tauri-plugin-phone-dialer-api";
+import {
+  ping,
+  dialPhoneNumber,
+  requestPhonePermission,
+  checkPhonePermission,
+  type DialPhoneResult,
+  type PermissionResult,
+} from "tauri-plugin-phone-dialer-api";
 
 // 条件导入相机插件，只在需要时导入
 let takePicture: any = null;
@@ -30,6 +37,16 @@ const pingResult = ref("");
 const rustPingInput = ref("Hello from Rust Command!");
 const rustPingResult = ref("");
 
+// 拨号功能相关
+const phoneNumber = ref("10086");
+const dialResult = ref("");
+const rustDialPhoneNumber = ref("10010");
+const rustDialResult = ref("");
+
+// 权限相关
+const permissionStatus = ref("");
+const hasPhonePermission = ref(false);
+
 onMounted(async () => {
   try {
     platformName.value = await platform();
@@ -45,6 +62,14 @@ onMounted(async () => {
       } catch (error) {
         cameraStatus.value = "相机插件加载失败";
         console.error("相机插件加载错误:", error);
+      }
+
+      // 检查电话权限状态
+      try {
+        await checkPermissionStatus();
+      } catch (error) {
+        console.error("权限检查失败:", error);
+        permissionStatus.value = "权限检查失败";
       }
     }
   } catch (error) {
@@ -136,6 +161,67 @@ async function testRustPing() {
 function clearPingResults() {
   pingResult.value = "";
   rustPingResult.value = "";
+}
+
+// 拨号功能测试函数
+async function testDialPhone() {
+  try {
+    dialResult.value = "正在调用 TypeScript 拨号...";
+    const result: DialPhoneResult = await dialPhoneNumber(phoneNumber.value);
+    dialResult.value = `TypeScript 拨号结果: ${
+      result.success ? "成功" : "失败"
+    } - ${result.message}`;
+  } catch (error) {
+    dialResult.value = `TypeScript 拨号失败: ${error}`;
+    console.error("TypeScript 拨号错误:", error);
+  }
+}
+
+async function testRustDialPhone() {
+  try {
+    rustDialResult.value = "正在调用 Rust command 拨号...";
+    const result = await invoke("plugin:phone-dialer|dial_phone_number", {
+      payload: { phoneNumber: rustDialPhoneNumber.value },
+    });
+    rustDialResult.value = `Rust 拨号结果: ${JSON.stringify(result)}`;
+  } catch (error) {
+    rustDialResult.value = `Rust 拨号失败: ${error}`;
+    console.error("Rust 拨号错误:", error);
+  }
+}
+
+function clearDialResults() {
+  dialResult.value = "";
+  rustDialResult.value = "";
+}
+
+// 权限相关函数
+async function checkPermissionStatus() {
+  try {
+    const result: PermissionResult = await checkPhonePermission();
+    hasPhonePermission.value = result.success;
+    permissionStatus.value = result.message;
+  } catch (error) {
+    console.error("检查权限状态失败:", error);
+    permissionStatus.value = "权限检查失败";
+    hasPhonePermission.value = false;
+  }
+}
+
+async function requestPermission() {
+  try {
+    permissionStatus.value = "正在请求电话权限...";
+    const result: PermissionResult = await requestPhonePermission();
+    permissionStatus.value = result.message;
+
+    // 请求后重新检查权限状态
+    setTimeout(async () => {
+      await checkPermissionStatus();
+    }, 1000);
+  } catch (error) {
+    console.error("请求权限失败:", error);
+    permissionStatus.value = "权限请求失败";
+  }
 }
 </script>
 
@@ -255,6 +341,33 @@ function clearPingResults() {
         <p class="plugin-success">✅ 此插件在所有平台上都可以使用</p>
       </div>
 
+      <!-- 权限状态显示 -->
+      <div v-if="isAndroid" class="permission-info">
+        <h3>📱 电话权限状态</h3>
+        <div class="permission-status">
+          <span
+            :class="{
+              'permission-granted': hasPhonePermission,
+              'permission-denied': !hasPhonePermission,
+            }"
+          >
+            {{ hasPhonePermission ? "✅ 已授权" : "❌ 未授权" }}
+          </span>
+          <p>{{ permissionStatus }}</p>
+        </div>
+        <div v-if="!hasPhonePermission" class="permission-actions">
+          <button @click="requestPermission" class="permission-btn">
+            🔓 请求电话权限
+          </button>
+          <button
+            @click="checkPermissionStatus"
+            class="permission-btn check-btn"
+          >
+            🔍 重新检查权限
+          </button>
+        </div>
+      </div>
+
       <!-- TypeScript Ping 测试 -->
       <div class="ping-test-section">
         <h3>🔷 TypeScript Ping 测试</h3>
@@ -295,6 +408,53 @@ function clearPingResults() {
         <button @click="clearPingResults" class="clear-btn">🗑️ 清除结果</button>
       </div>
 
+      <!-- 拨号功能测试 -->
+      <div class="dial-section">
+        <h2>📞 拨号功能测试</h2>
+
+        <!-- TypeScript 拨号测试 -->
+        <div class="ping-test-section">
+          <h3>🔷 TypeScript 拨号测试</h3>
+          <div class="ping-controls">
+            <input
+              v-model="phoneNumber"
+              placeholder="输入电话号码 (如: 10086)"
+              class="ping-input"
+            />
+            <button @click="testDialPhone" class="ping-btn ts-btn">
+              📞 TS 拨号
+            </button>
+          </div>
+          <div v-if="dialResult" class="ping-result">
+            {{ dialResult }}
+          </div>
+        </div>
+
+        <!-- Rust Command 拨号测试 -->
+        <div class="ping-test-section">
+          <h3>🦀 Rust Command 拨号测试</h3>
+          <div class="ping-controls">
+            <input
+              v-model="rustDialPhoneNumber"
+              placeholder="输入电话号码 (如: 10010)"
+              class="ping-input"
+            />
+            <button @click="testRustDialPhone" class="ping-btn rust-btn">
+              📞 Rust 拨号
+            </button>
+          </div>
+          <div v-if="rustDialResult" class="ping-result">
+            {{ rustDialResult }}
+          </div>
+        </div>
+
+        <div class="ping-controls">
+          <button @click="clearDialResults" class="clear-btn">
+            🗑️ 清除拨号结果
+          </button>
+        </div>
+      </div>
+
       <!-- 使用说明 -->
       <div class="instructions">
         <h3>📋 使用说明:</h3>
@@ -309,6 +469,15 @@ function clearPingResults() {
           <li>两种方式都会调用相同的 Rust 后端逻辑</li>
           <li>可以输入任意文本进行测试</li>
           <li>观察返回结果的格式差异</li>
+          <li><strong>拨号功能:</strong> 在 Android 平台上可以实际拨打电话</li>
+          <li>
+            <strong>注意:</strong>
+            拨号功能需要电话权限，首次使用时系统会提示授权
+          </li>
+          <li>
+            <strong>测试号码:</strong> 建议使用客服号码如 10086、10010
+            等进行测试
+          </li>
         </ul>
       </div>
     </div>
@@ -715,6 +884,74 @@ button {
   border-left: 4px solid #3b82f6;
 }
 
+.dial-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fafafa;
+}
+
+/* 权限相关样式 */
+.permission-info {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  border-left: 4px solid #007bff;
+}
+
+.permission-info h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.permission-status {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.permission-granted {
+  color: #28a745;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.permission-denied {
+  color: #dc3545;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.permission-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.permission-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.permission-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.check-btn {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
 @media (prefers-color-scheme: dark) {
   .phone-dialer-section {
     background-color: #1a1a1a;
@@ -751,6 +988,28 @@ button {
     background-color: #2d3748;
     color: #e2e8f0;
     border-left-color: #4299e1;
+  }
+
+  .dial-section {
+    background-color: #1a1a1a;
+    border-color: #444;
+  }
+
+  .permission-info {
+    background-color: #2d3748;
+    border-left-color: #4299e1;
+  }
+
+  .permission-info h3 {
+    color: #e2e8f0;
+  }
+
+  .permission-granted {
+    color: #68d391;
+  }
+
+  .permission-denied {
+    color: #f56565;
   }
 }
 </style>
